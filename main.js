@@ -1,53 +1,73 @@
 class Metronome {
     constructor(bpm = 120, beatsPerMeasure = 4, volume = 0.5) {
         this.audioContext = new (window.AudioContext || window.webkitAudioContext)();
-        this.bpm = bpm;
-        this.beatsPerMeasure = beatsPerMeasure;
-        this.volume = volume;
+        this.bpm = localStorage.getItem('metronomeBPM') || bpm;
+        this.beatsPerMeasure = localStorage.getItem('metronomeBeatsPerMeasure') || beatsPerMeasure;
+        this.volume = localStorage.getItem('metronomeVolume') || volume;
         this.isPlaying = false;
         this.currentBeatInMeasure = 0;
         this.nextNoteTime = 0.0;
         this.timerID = null;
+        this.bpmRange = document.getElementById('bpm-range');
+        this.bpmText = document.getElementById('bpm-text');
+        this.volumeRange = document.getElementById('volume-range');
+        this.volumeText = document.getElementById('volume-text');
+        this.beatsText = document.getElementById('beats-text');
+        this.playBtn = document.getElementById('play-btn');
+    }
+    
+    initialize() {
+        this.bpmRange.value = this.bpm;
+        this.bpmText.value = this.bpm;
+        this.volumeRange.value = this.volume * 100;
+        this.volumeText.value = this.volume * 100;
+        this.beatsText.value = this.beatsPerMeasure;
+        this.playBtn.classList.remove('playing');
+    }
+
+    saveSettings() {
+        localStorage.setItem('metronomeBPM', this.bpm);
+        localStorage.setItem('metronomeBeatsPerMeasure', this.beatsPerMeasure);
+        localStorage.setItem('metronomeVolume', this.volume);
     }
 }
 
 document.addEventListener('DOMContentLoaded', () => {
-    const bpmRange = document.getElementById('bpm-range');
-    const bpmText = document.getElementById('bpm-text');
-    const volumeRange = document.getElementById('volume-range');
-    const volumeText = document.getElementById('volume-text');
-    const beatsText = document.getElementById('beats-text');
-    const playBtn = document.getElementById('play-btn');
     const metronome = new Metronome();
+    metronome.initialize();
 
-    bpmRange.addEventListener('input', (e) => {
-        bpmText.value = e.target.value;
+    window.addEventListener('unload', () => {
+        metronome.saveSettings();
+    });
+
+    metronome.bpmRange.addEventListener('input', (e) => {
+        metronome.bpmText.value = e.target.value;
         metronome.bpm = e.target.value;
     });
-    bpmText.addEventListener('change', (e) => {
+    metronome.bpmText.addEventListener('change', (e) => {
         let val = parseInt(e.target.value, 10);
         if (isNaN(val)) val = 120;
         val = Math.max(30, Math.min(300, val));
         e.target.value = val;
-        bpmRange.value = val;
+        metronome.bpmRange.value = val;
         metronome.bpm = val;
     });
 
-    volumeRange.addEventListener('input', (e) => {
-        volumeText.value = e.target.value;
+    metronome.volumeRange.addEventListener('input', (e) => {
+        metronome.volumeText.value = e.target.value;
         metronome.volume = e.target.value / 100;
     });
 
-    volumeText.addEventListener('change', (e) => {
+    metronome.volumeText.addEventListener('change', (e) => {
         let val = parseInt(e.target.value, 10);
         if (isNaN(val)) val = 50;
         val = Math.max(0, Math.min(100, val));
         e.target.value = val;
-        volumeRange.value = val;
+        metronome.volumeRange.value = val;
         metronome.volume = val / 100;
     });
 
-    beatsText.addEventListener('change', (e) => {
+    metronome.beatsText.addEventListener('change', (e) => {
         let val = parseInt(e.target.value, 10);
         if (isNaN(val) || val < 1) val = 4;
         e.target.value = val;
@@ -94,12 +114,12 @@ document.addEventListener('DOMContentLoaded', () => {
         metronome.timerID = setTimeout(scheduler, 25.0);
     }
 
-    playBtn.addEventListener('click', () => {
+    metronome.playBtn.addEventListener('click', () => {
         if (metronome.isPlaying) {
             clearTimeout(metronome.timerID);
             metronome.isPlaying = false;
-            playBtn.textContent = '再生';
-            playBtn.classList.remove('playing');
+            metronome.playBtn.textContent = '再生';
+            metronome.playBtn.classList.remove('playing');
         } else {
             if (metronome.audioContext.state === 'suspended') {
                 metronome.audioContext.resume();
@@ -109,8 +129,8 @@ document.addEventListener('DOMContentLoaded', () => {
             scheduler();
 
             metronome.isPlaying = true;
-            playBtn.textContent = '停止';
-            playBtn.classList.add('playing');
+            metronome.playBtn.textContent = '停止';
+            metronome.playBtn.classList.add('playing');
         }
     });
 });
