@@ -1,0 +1,35 @@
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="style.css">
+    <script defer src="main.js"></script>
+    <title>Webメトロノーム</title>
+</head>
+<body>
+    <div class="metronome">
+        <h1>メトロノーム</h1>
+        <div class="control-group">
+            <label>テンポ (BPM)</label>
+            <div class="input-row">
+                <input type="range" id="bpm-range" min="30" max="300" value="120">
+                <input type="text" id="bpm-text" value="120">
+            </div>
+        </div>
+        <div class="control-group">
+            <label>拍子 (1小節あたりの拍数)</label>
+            <div class="input-row">
+                <input type="text" id="beats-text" value="4">
+            </div>
+        </div>
+        <div class="control-group">
+            <label>音量 (%)</label>
+            <div class="input-row">
+                <input type="range" id="volume-range" min="0" max="100" value="50">
+                <input type="text" id="volume-text" value="50">
+            </div>
+        </div>
+        <button id="play-btn">再生</button>
+    </div>
+</body>
+</html>
